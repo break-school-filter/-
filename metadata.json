@@ -1,0 +1,6 @@
+{
+  "name": "ルーレット&ビンゴ",
+  "description": "合宿、お泊まり会、研修、サークル活動、パーティーなどの部屋割り、班分け、役割分担、景品抽選、レクやビンゴ大会などで使える、ビジュアルと音にこだわった高機能で使いやすいカスタマイズルーレット＆ビンゴアプリです。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
