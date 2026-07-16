@@ -32,6 +32,7 @@ export default function App() {
   const [settings, setSettings] = useState<RouletteSettings>(DEFAULT_SETTINGS);
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState<RouletteOption | null>(null);
+  const [lastWinner, setLastWinner] = useState<RouletteOption | null>(null);
   const [activeTab, setActiveTab] = useState<"items" | "history" | "settings">("items");
 
   // Load from LocalStorage
@@ -105,11 +106,16 @@ export default function App() {
   const handleSpinStart = () => {
     setIsSpinning(true);
     setWinner(null);
+    setLastWinner(null);
   };
 
-  const handleSpinEnd = (winnerOption: RouletteOption) => {
+  const handleSpinEnd = (winnerOption: RouletteOption, isQuick: boolean = false) => {
     setIsSpinning(false);
-    setWinner(winnerOption);
+    setLastWinner(winnerOption);
+    
+    if (!isQuick) {
+      setWinner(winnerOption);
+    }
 
     // Save log entry
     const newLog: SpinLog = {
@@ -237,6 +243,14 @@ export default function App() {
                   isSpinning={isSpinning}
                   spinDuration={settings.duration}
                 />
+                {lastWinner && (
+                  <div className="mt-4 px-6 py-2.5 bg-[#0c0c0e]/90 border border-[#D4AF37]/35 rounded-xl text-center animate-fade-in flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(212,175,55,0.15)]">
+                    <span className="text-[#D4AF37] font-bold text-sm">🎯 最新の当選結果:</span>
+                    <span className="font-extrabold text-base" style={{ color: lastWinner.color }}>
+                      {lastWinner.name}
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Right Column: Dashboards (Col span 7) */}

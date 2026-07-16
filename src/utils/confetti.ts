@@ -38,109 +38,11 @@ export class ConfettiGenerator {
   }
 
   public burst(count = 150, winnerName?: string) {
-    this.resize();
-    const centerX = this.canvas.width / 2;
-    const centerY = this.canvas.height / 2;
-
-    const shapes: ("circle" | "square" | "triangle")[] = ["circle", "square", "triangle"];
-
-    // Standard confetti shapes
-    for (let i = 0; i < count; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 4 + Math.random() * 12;
-      
-      this.particles.push({
-        x: centerX,
-        y: centerY - 50, // Slightly above center
-        size: 6 + Math.random() * 8,
-        color: this.colors[Math.floor(Math.random() * this.colors.length)],
-        shape: shapes[Math.floor(Math.random() * shapes.length)],
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 5, // Upward bias
-        rotation: Math.random() * Math.PI * 2,
-        rotationSpeed: -0.1 + Math.random() * 0.2,
-        opacity: 1
-      });
-    }
-
-    // Add winner's name as text particles bursting outward
-    if (winnerName) {
-      const textCount = 12;
-      for (let i = 0; i < textCount; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 3 + Math.random() * 7;
-        this.particles.push({
-          x: centerX,
-          y: centerY - 50,
-          size: 16 + Math.random() * 8, // Readable text size
-          color: i % 2 === 0 ? "#D4AF37" : "#FFFFFF", // Elegant gold/white mix
-          shape: "text",
-          text: winnerName,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - 6,
-          rotation: -0.2 + Math.random() * 0.4, // Controlled rotation for readability
-          rotationSpeed: -0.01 + Math.random() * 0.02,
-          opacity: 1
-        });
-      }
-    }
-
-    if (!this.animationFrameId) {
-      this.animate();
-    }
+    // No-op to prevent performance issues and lag
   }
 
   public sideShower(winnerName?: string) {
-    this.resize();
-    const width = this.canvas.width;
-    const height = this.canvas.height;
-    const shapes: ("circle" | "square" | "triangle")[] = ["circle", "square", "triangle"];
-
-    // Left side launcher
-    for (let i = 0; i < 60; i++) {
-      const angle = -Math.PI / 6 - Math.random() * Math.PI / 4; // aimed top-right
-      const speed = 10 + Math.random() * 14;
-      const isText = winnerName && Math.random() < 0.15; // 15% text probability
-
-      this.particles.push({
-        x: 0,
-        y: height * 0.8,
-        size: isText ? 14 + Math.random() * 6 : 6 + Math.random() * 8,
-        color: isText ? (Math.random() < 0.5 ? "#D4AF37" : "#FFFFFF") : this.colors[Math.floor(Math.random() * this.colors.length)],
-        shape: isText ? "text" : shapes[Math.floor(Math.random() * shapes.length)],
-        text: isText ? winnerName : undefined,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        rotation: isText ? -0.2 + Math.random() * 0.4 : Math.random() * Math.PI * 2,
-        rotationSpeed: isText ? -0.01 + Math.random() * 0.02 : -0.1 + Math.random() * 0.2,
-        opacity: 1
-      });
-    }
-
-    // Right side launcher
-    for (let i = 0; i < 60; i++) {
-      const angle = -Math.PI * 5 / 6 + Math.random() * Math.PI / 4; // aimed top-left
-      const speed = 10 + Math.random() * 14;
-      const isText = winnerName && Math.random() < 0.15; // 15% text probability
-
-      this.particles.push({
-        x: width,
-        y: height * 0.8,
-        size: isText ? 14 + Math.random() * 6 : 6 + Math.random() * 8,
-        color: isText ? (Math.random() < 0.5 ? "#D4AF37" : "#FFFFFF") : this.colors[Math.floor(Math.random() * this.colors.length)],
-        shape: isText ? "text" : shapes[Math.floor(Math.random() * shapes.length)],
-        text: isText ? winnerName : undefined,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        rotation: isText ? -0.2 + Math.random() * 0.4 : Math.random() * Math.PI * 2,
-        rotationSpeed: isText ? -0.01 + Math.random() * 0.02 : -0.1 + Math.random() * 0.2,
-        opacity: 1
-      });
-    }
-
-    if (!this.animationFrameId) {
-      this.animate();
-    }
+    // No-op to prevent performance issues and lag
   }
 
   private animate = () => {

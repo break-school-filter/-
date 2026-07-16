@@ -99,13 +99,39 @@ export const BingoMode: React.FC = () => {
   };
 
   // Trigger a bingo number draw
-  const drawNumber = () => {
+  const drawNumber = (isQuick: boolean = false) => {
     if (isRolling) return;
 
     const remaining = getRemainingNumbers();
     if (remaining.length === 0) {
       alert("すべての番号が引き出されました！");
       setAutoDraw(false);
+      return;
+    }
+
+    if (isQuick) {
+      // Instant Draw
+      const finalIndex = Math.floor(Math.random() * remaining.length);
+      const finalNum = remaining[finalIndex];
+
+      setCalledNumbers(prev => [...prev, finalNum]);
+      setRecentDrawn(finalNum);
+      setCurrentRollNumber(finalNum);
+      setIsRolling(false);
+
+      // Play victory fanfare!
+      audioSynth.playFanfare();
+
+      // Confetti burst!
+      if (confettiRef.current) {
+        confettiRef.current.burst(150, `No.${finalNum}`);
+        // trigger side showers shortly after
+        setTimeout(() => {
+          if (confettiRef.current) {
+            confettiRef.current.sideShower(`No.${finalNum}`);
+          }
+        }, 350);
+      }
       return;
     }
 
@@ -400,18 +426,33 @@ export const BingoMode: React.FC = () => {
 
         {/* Action Button & Settings */}
         <div className="w-full max-w-xs flex flex-col items-center gap-3 z-10">
-          <button
-            type="button"
-            disabled={isRolling || remainingCount === 0}
-            onClick={drawNumber}
-            className={`w-full py-4 rounded-full font-serif-jp font-bold text-xl uppercase tracking-[0.3em] transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 ${
-              isRolling || remainingCount === 0
-                ? "bg-[#1a1a1a] text-slate-600 border border-[#D4AF37]/20 cursor-not-allowed"
-                : "bg-[#D4AF37] hover:brightness-110 text-[#0c0c0e] border border-[#FCF6BA]/40 shadow-[0_0_25px_rgba(212,175,55,0.4)] hover:shadow-[0_0_35px_rgba(212,175,55,0.6)] animate-[pulse_2.5s_infinite]"
-            }`}
-          >
-            {isRolling ? "SHUFFLING..." : "DRAW (引く)"}
-          </button>
+          <div className="flex gap-2 w-full">
+            <button
+              type="button"
+              disabled={isRolling || remainingCount === 0}
+              onClick={() => drawNumber(false)}
+              className={`flex-[2] py-4 rounded-full font-serif-jp font-bold text-base uppercase tracking-wider transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 ${
+                isRolling || remainingCount === 0
+                  ? "bg-[#1a1a1a] text-slate-600 border border-[#D4AF37]/20 cursor-not-allowed"
+                  : "bg-[#D4AF37] hover:brightness-110 text-[#0c0c0e] border border-[#FCF6BA]/40 shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.5)]"
+              }`}
+            >
+              {isRolling ? "SHUFFLING..." : "DRAW (通常)"}
+            </button>
+
+            <button
+              type="button"
+              disabled={isRolling || remainingCount === 0}
+              onClick={() => drawNumber(true)}
+              className={`flex-1 py-4 rounded-full font-serif-jp font-bold text-xs uppercase tracking-normal transition-all duration-300 active:scale-95 flex items-center justify-center gap-1 ${
+                isRolling || remainingCount === 0
+                  ? "bg-[#1a1a1a] text-slate-600 border border-slate-800 cursor-not-allowed"
+                  : "bg-slate-800 hover:bg-slate-700 text-[#FCF6BA] border border-[#D4AF37]/30 hover:border-[#D4AF37]/60"
+              }`}
+            >
+              <span>⚡</span> 高速
+            </button>
+          </div>
 
           {/* Sub Row: Auto Mode Toggle, Sound Toggle */}
           <div className="flex items-center justify-between w-full border-t border-slate-800/60 pt-4 px-1 text-xs">

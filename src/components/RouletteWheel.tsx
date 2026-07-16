@@ -5,7 +5,7 @@ import { audioSynth } from "../utils/audio";
 interface RouletteWheelProps {
   options: RouletteOption[];
   onSpinStart: () => void;
-  onSpinEnd: (winner: RouletteOption) => void;
+  onSpinEnd: (winner: RouletteOption, isQuick: boolean) => void;
   isSpinning: boolean;
   spinDuration: number; // in seconds
 }
@@ -58,19 +58,36 @@ export const RouletteWheel: React.FC<RouletteWheelProps> = ({
   };
 
   // Spin function
-  const spin = () => {
+  const spin = (isQuick: boolean = false) => {
     if (isSpinning || activeOptions.length === 0) return;
 
     onSpinStart();
     isSpinningRef.current = true;
 
-    // Start drumroll sound in background
-    const drumroll = audioSynth.playDrumroll(spinDuration * 1000);
-
     const startRot = rotationRef.current % 360;
     // Aim for 5-8 full spins plus a random segment
     const extraSpins = 6 + Math.random() * 3;
     const targetRot = startRot + extraSpins * 360 + Math.random() * 360;
+
+    if (isQuick) {
+      // Instant spin finished
+      setRotation(targetRot);
+      rotationRef.current = targetRot;
+      isSpinningRef.current = false;
+
+      // Determine winner
+      const winningIndex = getIndexAtAngle(targetRot);
+      const winner = segments[winningIndex];
+      if (winner) {
+        // Play winning fanfare
+        audioSynth.playFanfare();
+        onSpinEnd(winner, true);
+      }
+      return;
+    }
+
+    // Start drumroll sound in background
+    const drumroll = audioSynth.playDrumroll(spinDuration * 1000);
     const startTime = performance.now();
 
     const animateSpin = (now: number) => {
@@ -91,7 +108,7 @@ export const RouletteWheel: React.FC<RouletteWheelProps> = ({
         if (winner) {
           // Play winning fanfare
           audioSynth.playFanfare();
-          onSpinEnd(winner);
+          onSpinEnd(winner, false);
         }
         return;
       }
@@ -188,7 +205,7 @@ export const RouletteWheel: React.FC<RouletteWheelProps> = ({
               transform: `rotate(${rotation}deg)`,
               transition: isSpinning ? "none" : "transform 0.1s ease-out",
             }}
-            onClick={spin}
+            onClick={() => spin(false)}
             viewBox="0 0 300 300"
           >
             {activeOptions.length === 1 ? (
@@ -267,18 +284,31 @@ export const RouletteWheel: React.FC<RouletteWheelProps> = ({
       </div>
 
       {/* Centered Trigger Button */}
-      <div className="mt-8">
+      <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
         <button
           id="spin-button"
-          onClick={spin}
+          onClick={() => spin(false)}
           disabled={isSpinning || activeOptions.length === 0}
-          className={`px-16 py-4 rounded-full font-serif-jp font-bold text-xl uppercase tracking-[0.3em] transition-all duration-300 active:scale-95 ${
+          className={`flex-1 sm:flex-initial px-12 py-4 rounded-full font-serif-jp font-bold text-lg uppercase tracking-[0.2em] transition-all duration-300 active:scale-95 ${
             isSpinning || activeOptions.length === 0
               ? "bg-[#1a1a1a] text-slate-600 border border-[#D4AF37]/20 cursor-not-allowed shadow-none"
               : "bg-[#D4AF37] hover:brightness-110 text-[#0c0c0e] border border-[#FCF6BA]/40 shadow-[0_0_25px_rgba(212,175,55,0.4)] hover:shadow-[0_0_35px_rgba(212,175,55,0.6)] animate-[pulse_2.5s_infinite]"
           }`}
         >
-          {isSpinning ? "回転中" : "SPIN"}
+          {isSpinning ? "回転中..." : "SPIN (通常)"}
+        </button>
+        <button
+          id="quick-spin-button"
+          onClick={() => spin(true)}
+          disabled={isSpinning || activeOptions.length === 0}
+          className={`flex-1 sm:flex-initial px-6 py-4 rounded-full font-serif-jp font-bold text-sm uppercase tracking-wider transition-all duration-300 active:scale-95 flex items-center justify-center gap-1.5 ${
+            isSpinning || activeOptions.length === 0
+              ? "bg-[#1a1a1a] text-slate-600 border border-slate-800 cursor-not-allowed"
+              : "bg-slate-800 hover:bg-slate-700 text-[#FCF6BA] border border-[#D4AF37]/30 hover:border-[#D4AF37]/60"
+          }`}
+        >
+          <span>⚡</span>
+          高速スピン (一瞬)
         </button>
       </div>
     </div>
