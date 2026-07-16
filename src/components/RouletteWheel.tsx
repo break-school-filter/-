@@ -47,9 +47,9 @@ export const RouletteWheel: React.FC<RouletteWheelProps> = ({
 
   // Handle pointer index calculation
   const getIndexAtAngle = (angle: number): number => {
-    // Needle is at the top (270 degrees)
+    // Needle is at the top (12 o'clock, which is our 0 degrees reference in polarToCartesian)
     // Absolute wheel rotation is normalized
-    const normalizedRotation = ((360 - (angle % 360)) + 270) % 360;
+    const normalizedRotation = (360 - (angle % 360)) % 360;
     
     const index = segments.findIndex(
       (seg) => normalizedRotation >= seg.startAngle && normalizedRotation < seg.endAngle
